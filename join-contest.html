@@ -94,11 +94,12 @@ async function fetchPlayers() {
                     'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
                 }
             }
+            );
             const res = await fetch(url);
            const data = await res.json();
 
            console.log("API response:", data);
-        );
+        
 
         const data = await res.json();
 
