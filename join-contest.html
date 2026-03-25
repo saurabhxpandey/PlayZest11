@@ -83,25 +83,39 @@ function getRole(role) {
 }
 
 // ✅ MISSING FUNCTION FIXED
-function generatePlayers(team1, team2) {
-    return [
-        { name: `${team1} Player 1`, role: "BAT", credit: 9 },
-        { name: `${team1} Player 2`, role: "BOWL", credit: 8 },
-        { name: `${team1} Player 3`, role: "AR", credit: 10 },
+const squadRes = await fetch(
+    `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`,
+    {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': '36c74f9de6msh67bcfa168a28b51p1bbc47jsn33c882a98652',
+            'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
+        }
+    }
+);
 
-        { name: `${team2} Player 1`, role: "BAT", credit: 9 },
-        { name: `${team2} Player 2`, role: "BOWL", credit: 8 },
-        { name: `${team2} Player 3`, role: "AR", credit: 10 },
+const squadData = await squadRes.json();
 
-        // extra players to make 11+
-        { name: `${team1} Player 4`, role: "WK", credit: 9 },
-        { name: `${team2} Player 4`, role: "WK", credit: 9 },
-        { name: `${team1} Player 5`, role: "BAT", credit: 8 },
-        { name: `${team2} Player 5`, role: "BOWL", credit: 8 },
-        { name: `${team1} Player 6`, role: "AR", credit: 9 },
-        { name: `${team2} Player 6`, role: "BAT", credit: 9 }
-    ];
-}
+// players निकालना
+let squadPlayers = [];
+
+squadData?.matchInfo?.team1?.playerDetails?.forEach(p => {
+    squadPlayers.push({
+        name: p.name,
+        role: getRole(p.role),
+        credit: 8 + Math.random() * 2 // temp credit
+    });
+});
+
+squadData?.matchInfo?.team2?.playerDetails?.forEach(p => {
+    squadPlayers.push({
+        name: p.name,
+        role: getRole(p.role),
+        credit: 8 + Math.random() * 2
+    });
+});
+
+players = squadPlayers;
 
 // FETCH PLAYERS
 async function fetchPlayers() {
