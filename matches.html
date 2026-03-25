@@ -65,23 +65,57 @@ if (!user || !user.loggedIn) {
 
     </div>
 </section>
-
 <script>
 
-// ================= USER NAME =================
-document.getElementById("user-name").innerText = user?.name || user?.email || "User";
+// ================= USER =================
+const user = JSON.parse(localStorage.getItem("user"));
 
-// ================= LOGOUT =================
+if (!user || !user.loggedIn) {
+    window.location.href = "index.html";
+}
+
+document.getElementById("user-name").innerText =
+    user?.name || user?.email || "User";
+
 function logout() {
     localStorage.removeItem("user");
     window.location.href = "index.html";
 }
 
-// ================= WALLET =================
-await FSWallet.initFirestore();
-const wallet = await FSWallet.getUserWallet();
-document.getElementById("wallet").innerText = wallet;
+// ================= FIREBASE =================
+const firebaseConfig = {
+    apiKey: "YOUR_KEY",
+    authDomain: "YOUR_DOMAIN",
+    projectId: "YOUR_PROJECT_ID"
+};
 
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const userId = user?.uid || user?.email;
+
+// ================= WALLET =================
+let wallet = 0;
+
+// 🔥 create + fetch + realtime
+function initWallet() {
+    const ref = db.collection("users").doc(userId);
+
+    ref.get().then(doc => {
+        if (!doc.exists) {
+            ref.set({ wallet: 100 });
+        }
+    });
+
+    ref.onSnapshot(doc => {
+        if (doc.exists) {
+            wallet = doc.data().wallet || 0;
+            document.getElementById("wallet").innerText = wallet;
+        }
+    });
+}
+
+initWallet();
 
 // ================= MATCH DATA =================
 let matches = [];
@@ -91,9 +125,8 @@ let currentFilter = "all";
 async function fetchMatches() {
     try {
         const res = await fetch(
-            'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live',
+            'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming',
             {
-                method: 'GET',
                 headers: {
                     'X-RapidAPI-Key': '36c74f9de6msh67bcfa168a28b51p1bbc47jsn33c882a98652',
                     'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
@@ -102,17 +135,12 @@ async function fetchMatches() {
         );
 
         const data = await res.json();
-        console.log("Cricbuzz Data:", data);
 
-        const allMatches = data.typeMatches || [];
         let list = [];
 
-        allMatches.forEach(type => {
+        data.typeMatches?.forEach(type => {
             type.seriesMatches?.forEach(series => {
-
-                const matchesArr = series.seriesAdWrapper?.matches || [];
-
-                matchesArr.forEach(m => {
+                series.seriesAdWrapper?.matches?.forEach(m => {
 
                     const info = m.matchInfo || {};
 
@@ -120,7 +148,7 @@ async function fetchMatches() {
                         id: info.matchId,
                         team1: info.team1?.teamName || "Team A",
                         team2: info.team2?.teamName || "Team B",
-                        date: Number(info.startDate), // ✅ FIXED DATE
+                        date: Number(info.startDate),
                         format: info.matchFormat || "T20",
                         series: info.seriesName || "",
                         type: getType(info)
@@ -138,29 +166,19 @@ async function fetchMatches() {
     }
 }
 
-// ================= TYPE DETECTION =================
+// ================= TYPE =================
 function getType(m) {
     const text = (m.seriesName || "").toLowerCase();
 
-    if (text.includes("ipl") || text.includes("indian premier league")) {
-        return "ipl";
-    }
-
-    if (text.includes("t10")) {
-        return "t10";
-    }
+    if (text.includes("ipl")) return "ipl";
+    if (text.includes("t10")) return "t10";
 
     return "international";
 }
 
-// ================= DATE FORMAT =================
+// ================= DATE =================
 function formatDate(d) {
-    if (!d) return "No Date";
-
     const date = new Date(Number(d));
-
-    if (isNaN(date.getTime())) return "Invalid Date";
-
     return date.toLocaleString();
 }
 
@@ -169,15 +187,16 @@ function render(data) {
     const container = document.getElementById("matches-list");
     container.innerHTML = "";
 
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
         container.innerHTML = "<p>No matches found</p>";
         return;
     }
 
+    let html = "";
+
     data.forEach(m => {
-        container.innerHTML += `
+        html += `
         <div class="match-card-new">
-            
             <div class="top-row">
                 <span class="live-tag">UPCOMING</span>
                 <span class="match-format">${m.format}</span>
@@ -204,10 +223,11 @@ function render(data) {
                     Join ₹10
                 </button>
             </div>
-
         </div>
         `;
     });
+
+    container.innerHTML = html;
 }
 
 // ================= FILTER =================
@@ -219,7 +239,7 @@ function applyFilter() {
     }
 }
 
-// ================= FILTER BUTTON =================
+// ================= FILTER BTN =================
 document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         document.querySelector(".filter-btn.active").classList.remove("active");
@@ -232,19 +252,22 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
 
 // ================= JOIN MATCH =================
 async function joinMatch(id) {
-    const hasBalance = await FSWallet.hasUserBalance(10);
-    if (!hasBalance) {
+
+    if (wallet < 10) {
         alert("Insufficient balance!");
         return;
     }
 
-    await FSWallet.updateUserWallet(-10);
-    FSWallet.updateAllDisplays(await FSWallet.getUserWallet());
+    const ref = db.collection("users").doc(userId);
+
+    await ref.update({
+        wallet: wallet - 10
+    });
 
     window.location.href = "join-contest.html?match=" + id;
 }
 
-// ================= AUTO REFRESH =================
+// ================= INIT =================
 fetchMatches();
 setInterval(fetchMatches, 30000);
 
