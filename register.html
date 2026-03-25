@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - My Dream Team</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h2><i class="fas fa-trophy"></i> My Dream Team</h2>
+            </div>
+            <nav>
+                <a href="index.html">← Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Register Section -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-card">
+                <h1>Join My Dream Team</h1>
+                <p>Create account to start winning</p>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="reg-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="reg-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="reg-password" required>
+                    </div>
+                    <button type="submit" class="auth-btn">Register</button>
+                </form>
+                <p class="auth-link">Already have account? <a href="login.html">Login here</a></p>
+            </div>
+        </div>
+    </section>
+
+   <!-- Firebase SDK -->
+<script type="module">
+  // Import Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, updateProfile } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  // 🔥 Apna Firebase config yaha daalo
+  const firebaseConfig = {
+    apiKey: "AIzaSyA6TMMSZUSUX7HhV2G3T4OVaYyrDko4jqk",
+  authDomain: "mydreamteam-94f4c.firebaseapp.com",
+  projectId: "mydreamteam-94f4c",
+   appId: "1:298463861254:web:9512080e4d2eac95bf0187"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Form submit
+  document.getElementById('register-form').onsubmit = async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+
+    try {
+      // Create user
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Save name
+      await updateProfile(userCredential.user, {
+        displayName: name
+      });
+
+      alert("Registration successful!");
+      window.location.href = "login.html";
+
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+</script>
+</body>
+</html>
