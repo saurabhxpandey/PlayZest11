@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Team</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <h2>🏏 Create Team</h2>
+        </div>
+    </div>
+</header>
+
+<section class="contest-section">
+    <div class="container">
+
+        <!-- MATCH INFO -->
+        <div class="match-info">
+            <h1>Select Your Team</h1>
+            <div class="contest-details">
+                Players: <span id="count">0</span>/11 | Credits: <span id="credits">100</span>
+            </div>
+        </div>
+
+        <!-- TEAM BUILDER -->
+        <div class="team-builder">
+
+            <!-- PLAYERS -->
+            <div id="players-list" class="players-grid"></div>
+
+            <!-- SELECTED PLAYERS -->
+            <div class="team-summary">
+                <h3>Selected Players:</h3>
+                <div id="selected-list" class="selected-players"></div>
+
+                <div class="team-actions">
+                    <button onclick="saveTeam()" class="submit-team">
+                        Submit Team
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<script>
+
+// LOGIN CHECK
+const user = JSON.parse(localStorage.getItem("user"));
+if (!user || !user.loggedIn) {
+    window.location.href = "index.html";
+}
+
+// MATCH ID
+const params = new URLSearchParams(window.location.search);
+const matchId = params.get("match");
+
+// STATE
+let players = [];
+let selected = [];
+let credits = 100;
+
+// ROLE HELPER
+function getRole(role) {
+    if (!role) return "BAT";
+
+    role = role.toLowerCase();
+
+    if (role.includes("wk") || role.includes("keeper")) return "WK";
+    if (role.includes("bowl")) return "BOWL";
+    if (role.includes("all")) return "AR";
+
+    return "BAT";
+}
+
+// ✅ MISSING FUNCTION FIXED
+function generatePlayers(team1, team2) {
+    return [
+        { name: `${team1} Player 1`, role: "BAT", credit: 9 },
+        { name: `${team1} Player 2`, role: "BOWL", credit: 8 },
+        { name: `${team1} Player 3`, role: "AR", credit: 10 },
+
+        { name: `${team2} Player 1`, role: "BAT", credit: 9 },
+        { name: `${team2} Player 2`, role: "BOWL", credit: 8 },
+        { name: `${team2} Player 3`, role: "AR", credit: 10 },
+
+        // extra players to make 11+
+        { name: `${team1} Player 4`, role: "WK", credit: 9 },
+        { name: `${team2} Player 4`, role: "WK", credit: 9 },
+        { name: `${team1} Player 5`, role: "BAT", credit: 8 },
+        { name: `${team2} Player 5`, role: "BOWL", credit: 8 },
+        { name: `${team1} Player 6`, role: "AR", credit: 9 },
+        { name: `${team2} Player 6`, role: "BAT", credit: 9 }
+    ];
+}
+
+// FETCH PLAYERS
+async function fetchPlayers() {
+    try {
+        const res = await fetch(
+            `https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live`,
+            {
+                method: 'GET',
+                headers: {
+                    'X-RapidAPI-Key': '36c74f9de6msh67bcfa168a28b51p1bbc47jsn33c882a98652',
+                    'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        let match = null;
+
+        data.typeMatches?.forEach(type => {
+            type.seriesMatches?.forEach(series => {
+                series.seriesAdWrapper?.matches?.forEach(m => {
+                    if (m.matchInfo.matchId == matchId) {
+                        match = m.matchInfo;
+                    }
+                });
+            });
+        });
+
+        if (match) {
+            // ✅ FIX: global players update
+            players = generatePlayers(
+                match.team1.teamName,
+                match.team2.teamName
+            );
+        } else {
+            console.log("Match not found");
+        }
+
+    } catch (err) {
+        console.log(err);
+
+        // fallback
+        players = [
+            { name: "Virat Kohli", role: "BAT", credit: 10 },
+            { name: "Rohit Sharma", role: "BAT", credit: 9 },
+            { name: "Hardik Pandya", role: "AR", credit: 9 },
+            { name: "Jasprit Bumrah", role: "BOWL", credit: 9 }
+        ];
+    }
+
+    renderPlayers();
+}
+
+// RENDER
+function renderPlayers() {
+    const container = document.getElementById("players-list");
+    container.innerHTML = "";
+
+    players.forEach((p, i) => {
+        container.innerHTML += `
+        <div class="player-card" onclick="togglePlayer(${i})">
+            <div class="player-img">🏏</div>
+            <h4>${p.name}</h4>
+            <p>${p.role}</p>
+            <p>${p.credit} Cr</p>
+        </div>
+        `;
+    });
+}
+
+// SELECT PLAYER
+function togglePlayer(i) {
+    const player = players[i];
+
+    if (selected.includes(i)) {
+        selected = selected.filter(id => id !== i);
+        credits += player.credit;
+    } else {
+        if (selected.length >= 11) {
+            alert("Max 11 players!");
+            return;
+        }
+
+        if (credits < player.credit) {
+            alert("Not enough credits!");
+            return;
+        }
+
+        selected.push(i);
+        credits -= player.credit;
+    }
+
+    updateUI();
+}
+
+// UPDATE UI
+function updateUI() {
+    document.getElementById("count").innerText = selected.length;
+    document.getElementById("credits").innerText = credits;
+
+    document.querySelectorAll(".player-card").forEach((el, i) => {
+        el.classList.toggle("selected", selected.includes(i));
+    });
+
+    const list = document.getElementById("selected-list");
+    list.innerHTML = selected.map(i => `<span>${players[i].name}</span>`).join("");
+}
+
+// SAVE TEAM
+function saveTeam() {
+    if (selected.length !== 11) {
+        alert("Select 11 players!");
+        return;
+    }
+
+    const team = selected.map(i => players[i]);
+
+    localStorage.setItem("team", JSON.stringify(team));
+    localStorage.setItem("matchId", matchId);
+
+    alert("Team Saved!");
+    window.location.href = "contest.html";
+}
+
+// INIT
+fetchPlayers();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matches - My Dream Team</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+<!-- 🔐 AUTO LOGIN CHECK -->
+<script>
+const user = JSON.parse(localStorage.getItem("user"));
+
+if (!user || !user.loggedIn) {
+    window.location.href = "index.html";
+}
+</script>
+
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <h2><i class="fas fa-trophy"></i> My Dream Team</h2>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="matches.html" class="nav-link active">Matches</a>
+            <a href="join-contest.html" class="nav-link">Contests</a>
+            <a href="#" class="nav-link" onclick="logout()">Logout</a>
+        </nav>
+
+        <div class="user-menu">
+            <i class="fas fa-user"></i>
+            <span id="user-name"></span>
+        </div>
+
+        <div class="wallet">
+            💰 ₹<span id="wallet">0</span>
+        </div>
+    </div>
+</header>
+
+<section class="matches-section">
+    <div class="container">
+
+        <div class="section-header">
+            <h2>Upcoming Matches</h2>
+
+            <div class="match-filters">
+                <button class="filter-btn active" data-type="all">All</button>
+                <button class="filter-btn" data-type="ipl">IPL</button>
+                <button class="filter-btn" data-type="t10">T10</button>
+                <button class="filter-btn" data-type="international">International</button>
+            </div>
+        </div>
+
+        <div id="matches-list" class="matches-grid"></div>
+
+    </div>
+</section>
+
+<script>
+
+// ================= USER NAME =================
+document.getElementById("user-name").innerText = user?.name || user?.email || "User";
+
+// ================= LOGOUT =================
+function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "index.html";
+}
+
+// ================= WALLET =================
+let wallet = localStorage.getItem("wallet") || 100;
+document.getElementById("wallet").innerText = wallet;
+
+// ================= MATCH DATA =================
+let matches = [];
+let currentFilter = "all";
+
+// ================= FETCH MATCHES =================
+async function fetchMatches() {
+    try {
+        const res = await fetch(
+            'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live',
+            {
+                method: 'GET',
+                headers: {
+                    'X-RapidAPI-Key': '36c74f9de6msh67bcfa168a28b51p1bbc47jsn33c882a98652',
+                    'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
+                }
+            }
+        );
+
+        const data = await res.json();
+        console.log("Cricbuzz Data:", data);
+
+        const allMatches = data.typeMatches || [];
+        let list = [];
+
+        allMatches.forEach(type => {
+            type.seriesMatches?.forEach(series => {
+
+                const matchesArr = series.seriesAdWrapper?.matches || [];
+
+                matchesArr.forEach(m => {
+
+                    const info = m.matchInfo || {};
+
+                    list.push({
+                        id: info.matchId,
+                        team1: info.team1?.teamName || "Team A",
+                        team2: info.team2?.teamName || "Team B",
+                        date: Number(info.startDate), // ✅ FIXED DATE
+                        format: info.matchFormat || "T20",
+                        series: info.seriesName || "",
+                        type: getType(info)
+                    });
+
+                });
+            });
+        });
+
+        matches = list;
+        applyFilter();
+
+    } catch (err) {
+        console.log("API Error:", err);
+    }
+}
+
+// ================= TYPE DETECTION =================
+function getType(m) {
+    const text = (m.seriesName || "").toLowerCase();
+
+    if (text.includes("ipl") || text.includes("indian premier league")) {
+        return "ipl";
+    }
+
+    if (text.includes("t10")) {
+        return "t10";
+    }
+
+    return "international";
+}
+
+// ================= DATE FORMAT =================
+function formatDate(d) {
+    if (!d) return "No Date";
+
+    const date = new Date(Number(d));
+
+    if (isNaN(date.getTime())) return "Invalid Date";
+
+    return date.toLocaleString();
+}
+
+// ================= RENDER =================
+function render(data) {
+    const container = document.getElementById("matches-list");
+    container.innerHTML = "";
+
+    if (data.length === 0) {
+        container.innerHTML = "<p>No matches found</p>";
+        return;
+    }
+
+    data.forEach(m => {
+        container.innerHTML += `
+        <div class="match-card-new">
+            
+            <div class="top-row">
+                <span class="live-tag">UPCOMING</span>
+                <span class="match-format">${m.format}</span>
+            </div>
+
+            <div class="teams">
+                <div class="team">
+                    <div class="team-name">${m.team1}</div>
+                </div>
+
+                <div class="vs">VS</div>
+
+                <div class="team">
+                    <div class="team-name">${m.team2}</div>
+                </div>
+            </div>
+
+            <div class="match-time">
+                ${formatDate(m.date)}
+            </div>
+
+            <div class="bottom-row">
+                <button onclick="joinMatch('${m.id}')" class="join-btn">
+                    Join ₹10
+                </button>
+            </div>
+
+        </div>
+        `;
+    });
+}
+
+// ================= FILTER =================
+function applyFilter() {
+    if (currentFilter === "all") {
+        render(matches);
+    } else {
+        render(matches.filter(m => m.type === currentFilter));
+    }
+}
+
+// ================= FILTER BUTTON =================
+document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelector(".filter-btn.active").classList.remove("active");
+        btn.classList.add("active");
+
+        currentFilter = btn.dataset.type;
+        applyFilter();
+    });
+});
+
+// ================= JOIN MATCH =================
+function joinMatch(id) {
+    if (wallet < 10) {
+        alert("Insufficient balance!");
+        return;
+    }
+
+    wallet -= 10;
+    localStorage.setItem("wallet", wallet);
+    document.getElementById("wallet").innerText = wallet;
+
+    window.location.href = "join-contest.html?match=" + id;
+}
+
+// ================= AUTO REFRESH =================
+fetchMatches();
+setInterval(fetchMatches, 30000);
+
+</script>
+
+</body>
+</html>
