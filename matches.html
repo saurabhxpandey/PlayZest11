@@ -258,12 +258,10 @@ async function joinMatch(id) {
         return;
     }
 
-    const ref = db.collection("users").doc(userId);
+    // ❌ wallet deduction हटा दिया
+    // await ref.update({ wallet: wallet - 10 });
 
-    await ref.update({
-        wallet: wallet - 10
-    });
-
+    // ✅ सिर्फ redirect
     window.location.href = "join-contest.html?match=" + id;
 }
 
