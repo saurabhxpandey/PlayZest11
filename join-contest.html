@@ -85,17 +85,58 @@ function getRole(role) {
 // ✅ MAIN FUNCTION (ONLY ONE API USED)
 async function fetchPlayers() {
     try {
+
         const res = await fetch(
-            `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`,
-            {
-                method: 'GET',
-                headers: {
-                    'X-RapidAPI-Key': '36c74f9de6msh67bcfa168a28b51p1bbc47jsn33c882a98652',
-                    'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
-                }
-            }
-            );
-           
+            `https://api.cricapi.com/v1/match_squad?apikey=efa33d67-4814-4f14-a6fc-fd249b9de00b&id=${matchId}`
+        );
+
+        const data = await res.json();
+
+        console.log("CricAPI:", data);
+
+        let squadPlayers = [];
+
+        if (data && data.data && data.data.length > 0) {
+
+            data.data.forEach(team => {
+                team.players.forEach(p => {
+                    squadPlayers.push({
+                        name: p.name,
+                        role: getRole(p.role),
+                        credit: Math.floor(8 + Math.random() * 3)
+                    });
+                });
+            });
+
+        }
+
+        if (squadPlayers.length === 0) {
+            throw new Error("No players found");
+        }
+
+        players = squadPlayers;
+
+    } catch (err) {
+        console.log("API Error:", err);
+
+        // fallback
+        players = [
+            { name: "Virat Kohli", role: "BAT", credit: 10 },
+            { name: "Rohit Sharma", role: "BAT", credit: 9 },
+            { name: "Hardik Pandya", role: "AR", credit: 9 },
+            { name: "Jasprit Bumrah", role: "BOWL", credit: 9 },
+            { name: "MS Dhoni", role: "WK", credit: 9 },
+            { name: "KL Rahul", role: "BAT", credit: 9 },
+            { name: "Shubman Gill", role: "BAT", credit: 9 },
+            { name: "Ravindra Jadeja", role: "AR", credit: 9 },
+            { name: "Mohammed Shami", role: "BOWL", credit: 9 },
+            { name: "Surya Kumar Yadav", role: "BAT", credit: 9 },
+            { name: "Rishabh Pant", role: "WK", credit: 9 }
+        ];
+    }
+
+    renderPlayers();
+}
         
 
         const data = await res.json();
