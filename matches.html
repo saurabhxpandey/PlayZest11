@@ -120,7 +120,7 @@ initWallet();
 let matches = [];
 let currentFilter = "all";
 
-// ================= FETCH MATCHES =================
+// ================= FETCH MATCHS =================
 async function fetchMatches() {
     try {
         const res = await fetch(
@@ -129,70 +129,30 @@ async function fetchMatches() {
 
         const data = await res.json();
 
-        console.log(data);
+        console.log("API DATA:", data);
 
         let list = [];
 
-        data.data.forEach(m => {
-            list.push({
-                id: m.id, // 🔥 CricAPI match id
-                team1: m.teams[0],
-                team2: m.teams[1],
-                date: m.dateTimeGMT,
-                format: m.matchType,
-                type: "international"
+        if (data && data.data) {
+            data.data.forEach(m => {
+                list.push({
+                    id: m.id, // CricAPI id
+                    team1: m.teams?.[0] || "Team A",
+                    team2: m.teams?.[1] || "Team B",
+                    date: m.dateTimeGMT,
+                    format: m.matchType || "T20",
+                    type: "international"
+                });
             });
-        });
+        }
 
         matches = list;
         applyFilter();
 
     } catch (err) {
-        console.log(err);
-    }
-}
-
-     async function init() {
-    const res = await fetch(
-        "https://api.cricapi.com/v1/currentMatches?apikey=efa33d67-4814-4f14-a6fc-fd249b9de00b&offset=0"
-    );
-
-    const data = await res.json();
-
-    console.log(data);
-}
-
-init();
-
-        let list = [];
-
-        data.typeMatches?.forEach(type => {
-            type.seriesMatches?.forEach(series => {
-                series.seriesAdWrapper?.matches?.forEach(m => {
-
-                    const info = m.matchInfo || {};
-
-                    list.push({
-                        id: info.matchId,
-                        team1: info.team1?.teamName || "Team A",
-                        team2: info.team2?.teamName || "Team B",
-                        date: Number(info.startDate),
-                        format: info.matchFormat || "T20",
-                        series: info.seriesName || "",
-                        type: getType(info)
-                    });
-
-                });
-            });
-        });
-
-        matches = list;
-        applyFilter();
-
-    catch (err) {
         console.log("API Error:", err);
     }
-
+}
 
 // ================= TYPE =================
 function getType(m) {
