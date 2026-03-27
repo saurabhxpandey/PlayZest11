@@ -1,0 +1,23 @@
+{
+  "name": "playzest11",
+  "version": "1.0.0",
+  "description": "Fantasy Cricket Platform with Vercel Speed Insights",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saurabhxpandey/PlayZest11.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saurabhxpandey/PlayZest11/issues"
+  },
+  "homepage": "https://github.com/saurabhxpandey/PlayZest11#readme",
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
+  }
+}
