@@ -18,7 +18,7 @@
 
 <!-- 🔐 AUTO LOGIN CHECK -->
 <script>
-    const user = JSON.parse(localStorage.getItem("user"));
+   window.user = JSON.parse(localStorage.getItem("user"));
       if (!user || !user.loggedIn) {
       window.location.href = "index.html";
 }
@@ -74,8 +74,7 @@
 
 
 document.getElementById("user-name").innerText =
-    user?.name || user?.email || "User";
-
+    window.user?.name || window.user?.email || "User";
 function logout() {
     localStorage.removeItem("user");
     window.location.href = "index.html";
@@ -91,7 +90,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const userId = user?.uid || user?.email;
+const userId = window.user?.uid || window.user?.email;
 
 // ================= WALLET =================
 let wallet = 0;
@@ -101,8 +100,9 @@ function initWallet() {
     const ref = db.collection("users").doc(userId);
 
     ref.get().then(doc => {
-        if (!doc.exists) {
-            ref.set({ wallet: 100 });
+       if (!doc.exists) {
+         ref.set({ wallet: 0 });
+}
         }
     });
 
