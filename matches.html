@@ -153,10 +153,13 @@ async function fetchMatches() {
 }
 
      async function init() {
-           const res = await fetch(...);
-           const data = await res.json();
-     
-             console.log(data);
+    const res = await fetch(
+        "https://api.cricapi.com/v1/currentMatches?apikey=efa33d67-4814-4f14-a6fc-fd249b9de00b&offset=0"
+    );
+
+    const data = await res.json();
+
+    console.log(data);
 }
 
 init();
