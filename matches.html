@@ -152,7 +152,15 @@ async function fetchMatches() {
     }
 }
 
-        const data = await res.json();
+       async function init() {
+
+    const res = await fetch(...);
+    const data = await res.json();
+
+    console.log(data);
+}
+
+init();;
 
         let list = [];
 
