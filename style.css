@@ -576,3 +576,158 @@ footer {
     font-weight: bold;
     cursor: pointer;
 }
+
+/* WALLET SYSTEM STYLES */
+.wallet-section {
+    padding: 180px 0 80px;
+    background: #f8f9fa;
+}
+
+.wallet-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+    padding: 3rem 2rem;
+    border-radius: 25px;
+    margin-bottom: 3rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.balance-display h1 {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.balance-display p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.wallet-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.action-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.action-card h3 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.amount-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.amount-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 15px;
+    border: 2px solid #eee;
+    background: white;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.amount-btn:hover {
+    border-color: #ff6b35;
+    background: #fff5f2;
+    transform: translateY(-2px);
+}
+
+.secure-note, .withdraw-note {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+#withdraw-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+#withdraw-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+#withdraw-form input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+#withdraw-form input:focus {
+    outline: none;
+    border-color: #ff6b35;
+}
+
+.withdraw-btn {
+    width: 100%;
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    color: white;
+    border: none;
+    padding: 18px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.withdraw-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Wallet Link in Header */
+.wallet-link {
+    text-decoration: none;
+}
+
+.wallet {
+    cursor: pointer;
+    transition: color 0.3s;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    background: rgba(255,255,255,0.2);
+}
+
+.wallet:hover {
+    background: rgba(255,107,53,0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .wallet-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .balance-display h1 {
+        font-size: 3rem;
+    }
+    
+    .action-card {
+        padding: 2rem 1.5rem;
+    }
+}
