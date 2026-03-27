@@ -19,7 +19,7 @@
 <!-- 🔐 AUTO LOGIN CHECK -->
 <script>
    window.user = JSON.parse(localStorage.getItem("user"));
-      if (!user || !user.loggedIn) {
+      if (!window.user || !window.user.loggedIn) {
       window.location.href = "index.html";
 }
 
@@ -100,11 +100,10 @@ function initWallet() {
     const ref = db.collection("users").doc(userId);
 
     ref.get().then(doc => {
-       if (!doc.exists) {
-         ref.set({ wallet: 0 });
-}
-        }
-    });
+    if (!doc.exists) {
+        ref.set({ wallet: 0 });
+    }
+});
 
     ref.onSnapshot(doc => {
         if (doc.exists) {
