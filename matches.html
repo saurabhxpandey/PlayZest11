@@ -124,14 +124,33 @@ let currentFilter = "all";
 async function fetchMatches() {
     try {
         const res = await fetch(
-            'https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming',
-            {
-                headers: {
-                    'X-RapidAPI-Key': 'a483870f0amshbd1544ab591dfc1p1e7520jsn1fbcf2d181a8',
-                    'X-RapidAPI-Host': 'cricbuzz-cricket.p.rapidapi.com'
-                }
-            }
+            "https://api.cricapi.com/v1/currentMatches?apikey=efa33d67-4814-4f14-a6fc-fd249b9de00b&offset=0"
         );
+
+        const data = await res.json();
+
+        console.log(data);
+
+        let list = [];
+
+        data.data.forEach(m => {
+            list.push({
+                id: m.id, // 🔥 CricAPI match id
+                team1: m.teams[0],
+                team2: m.teams[1],
+                date: m.dateTimeGMT,
+                format: m.matchType,
+                type: "international"
+            });
+        });
+
+        matches = list;
+        applyFilter();
+
+    } catch (err) {
+        console.log(err);
+    }
+}
 
         const data = await res.json();
 
