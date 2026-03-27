@@ -95,107 +95,142 @@ if (!user || !user.loggedIn) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // User info
-    document.getElementById("user-name").innerText = user?.name || user?.email || "User";
-    document.getElementById("user-info").innerText = `Hi, ${user?.name || user?.email || "User"}!`;
 
-    // Load wallet
+    document.getElementById("user-name").innerText =
+        user?.name || user?.email || "User";
+
+    document.getElementById("user-info").innerText =
+        `Hi, ${user?.name || user?.email || "User"}!`;
+
     loadWallet();
 });
 
-// Wallet functions
-function getWallet() {
-    return parseInt(localStorage.getItem("wallet") || "100");
+// ================= FIREBASE =================
+const firebaseConfig = {
+  apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
+  authDomain: "playzest11.firebaseapp.com",
+  projectId: "playzest11"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const userId = user?.email;
+
+// ================= WALLET =================
+let wallet = 0;
+
+async function loadWallet() {
+    try {
+        const ref = db.collection("users").doc(userId);
+        const doc = await ref.get();
+
+        if (!doc.exists) {
+            await ref.set({ wallet: 100 });
+            wallet = 100;
+        } else {
+            wallet = doc.data().wallet || 0;
+        }
+
+        updateUI();
+
+    } catch (err) {
+        console.log("Wallet Error:", err);
+    }
 }
 
-function updateWallet(amount) {
-    let wallet = getWallet() + amount;
+function updateUI() {
+    document.getElementById("wallet-balance").innerText = wallet;
+    document.getElementById("current-balance").innerText = wallet;
+}
+
+async function updateWallet(amount) {
+    wallet += amount;
     if (wallet < 0) wallet = 0;
-    localStorage.setItem("wallet", wallet);
-    document.getElementById("wallet-balance").innerText = wallet;
-    document.getElementById("current-balance").innerText = wallet;
+
+    await db.collection("users").doc(userId).update({
+        wallet: wallet
+    });
+
+    updateUI();
 }
 
-function loadWallet() {
-    const wallet = getWallet();
-    document.getElementById("wallet-balance").innerText = wallet;
-    document.getElementById("current-balance").innerText = wallet;
-}
-
+// ================= LOGOUT =================
 function logout() {
     localStorage.removeItem("user");
     window.location.href = "index.html";
 }
 
-// Deposit - Razorpay
+// ================= DEPOSIT =================
 document.querySelectorAll('.amount-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         const amount = parseInt(this.dataset.amount);
-        initRazorpay(amount);
+        openRazorpay(amount);
     });
 });
 
-function initRazorpay(amount) {
-    const options = {
-        key: 'rzp_test_QW6TX8uqb7khlDPFIHTynKBP', // Test key - REPLACE WITH LIVE
+// 🔥 FIXED RAZORPAY
+function openRazorpay(amount) {
+
+    var options = {
+        key: "rzp_test_SUgayesX5AYTkg", 
         amount: amount * 100,
-        currency: 'INR',
-        name: 'PlayZest11',
+        currency: "INR",
+        name: "PlayZest11",
         description: `Deposit ₹${amount}`,
-        image: 'https://via.placeholder.com/150x150/ff6b35/ffffff?text=PZ11',
-        handler: function(response) {
-            updateWallet(amount);
-            alert(`✅ ₹${amount} added successfully! Payment ID: ${response.razorpay_payment_id}`);
+
+        handler: async function (response) {
+
+            await updateWallet(amount);
+
+            alert(`✅ ₹${amount} added successfully!\nPayment ID: ${response.razorpay_payment_id}`);
         },
+
         prefill: {
-            name: user.name || user.email,
-            email: user.email
+            name: user?.name || user?.email,
+            email: user?.email
         },
+
         theme: {
-            color: '#ff6b35'
+            color: "#ff6b35"
         }
     };
-    const rzp = new Razorpay(options);
+
+    var rzp = new Razorpay(options);
     rzp.open();
 }
 
-// Withdraw
-document.getElementById('withdraw-form').onsubmit = function(e) {
+// ================= WITHDRAW =================
+document.getElementById('withdraw-form').onsubmit = async function(e) {
     e.preventDefault();
-    
+
     const amount = parseInt(document.getElementById('withdraw-amount').value);
-    const wallet = getWallet();
-    
+
     if (amount > wallet) {
         alert('❌ Insufficient balance!');
         return;
     }
-    
+
     if (amount < 50) {
         alert('❌ Minimum ₹50');
         return;
     }
-    
-    // Deduct
-    updateWallet(-amount);
-    
-    // Owner WhatsApp msg (UPDATE PHONE NUMBER)
-    const ownerPhone = '7673019496'; // YOUR NUMBER HERE
+
+    await updateWallet(-amount);
+
+    const ownerPhone = '7673019496';
     const account = document.getElementById('withdraw-account').value;
     const name = document.getElementById('withdraw-name').value;
-    const userEmail = user.email;
-    
-    const message = `🚀 WITHDRAWAL REQUEST\n\nUser: ${name} (${userEmail})\nAmount: ₹${amount}\nAccount: ${account}\n\nProcess ASAP!`;
-    
+
+    const message = `🚀 WITHDRAWAL REQUEST\n\nUser: ${name} (${user.email})\nAmount: ₹${amount}\nAccount: ${account}`;
+
     const whatsappUrl = `https://wa.me/${ownerPhone}?text=${encodeURIComponent(message)}`;
-    
-    // Open WhatsApp
+
     window.open(whatsappUrl, '_blank');
-    
-    alert(`✅ Withdrawal request sent! ₹${amount} deducted. Check WhatsApp.`);
+
+    alert(`✅ Withdrawal request sent! ₹${amount} deducted.`);
     this.reset();
 };
 </script>
-
 </body>
 </html>
