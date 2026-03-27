@@ -138,8 +138,8 @@ async function loadWallet() {
         const doc = await ref.get();
 
         if (!doc.exists) {
-            await ref.set({ wallet: 100 });
-            wallet = 100;
+            await ref.set({ wallet: 0 }); // 🔥 zero start
+            wallet = 0;
         } else {
             wallet = doc.data().wallet || 0;
         }
