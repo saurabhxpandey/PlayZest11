@@ -20,14 +20,17 @@ export const FSWallet = {
 
   async getUserWallet() {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return 0;
 
-    const ref = doc(db, "users", user.uid);
+    if (!user || !user.email) {
+        console.error("User not found");
+        return 0;
+    }
+
+    const ref = doc(db, "users", user.email.toLowerCase());
     const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-      return snap.data().wallet || 0;
-    } else {
+    return snap.exists() ? snap.data().wallet || 0 : 0;
+} else {
       return 0;
     }
   }
