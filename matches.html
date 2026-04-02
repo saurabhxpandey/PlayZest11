@@ -17,7 +17,7 @@
 <!-- 🔐 AUTO LOGIN CHECK -->
 <script>
 const user = JSON.parse(localStorage.getItem("user"));
-
+const ref = doc(db, "users", user.email);
 if (!user || !user.loggedIn) {
     window.location.href = "index.html";
 }
@@ -65,7 +65,17 @@ if (!user || !user.loggedIn) {
 
     </div>
 </section>
- <script src="fswallet.js"></script>
+ <script type="module">
+    import { FSWallet } from "fswallet.js";
+
+    async function loadWallet() {
+       await FSWallet.initFirestore();
+       const wallet = await FSWallet.getUserWallet();
+       document.getElementById("wallet").innerText = wallet;
+}
+
+loadWallet();
+</script>
 <script>
 
 // ================= USER NAME =================
