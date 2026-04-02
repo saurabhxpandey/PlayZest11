@@ -29,8 +29,7 @@ loadWallet();
 <!-- 🔐 AUTO LOGIN CHECK -->
 <script >
     const user = JSON.parse(localStorage.getItem("user"));
-
-     const ref = doc(db, "users", user.email);
+     console.log("User:", user);
     if (!user || !user.loggedIn) {
         window.location.href = "index.html";
 }
