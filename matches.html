@@ -78,9 +78,13 @@ function logout() {
 }
 
 // ================= WALLET =================
-await FSWallet.initFirestore();
-const wallet = await FSWallet.getUserWallet();
-document.getElementById("wallet").innerText = wallet;
+async function loadWallet() {
+    await FSWallet.initFirestore();
+    const wallet = await FSWallet.getUserWallet();
+    document.getElementById("wallet").innerText = wallet;
+}
+
+loadWallet();
 
 
 // ================= MATCH DATA =================
