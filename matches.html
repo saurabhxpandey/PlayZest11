@@ -13,6 +13,18 @@
 </head>
 
 <body>
+    <script type="module">
+       
+        import { FSWallet } from "./fswallet.js";
+
+          async function loadWallet() {
+               await FSWallet.initFirestore();
+                const wallet = await FSWallet.getUserWallet();
+               document.getElementById("wallet").innerText = wallet;
+}
+
+loadWallet();
+</script>
 
 <!-- 🔐 AUTO LOGIN CHECK -->
 <script >
@@ -66,18 +78,7 @@
 
     </div>
 </section>
- <script type="module">
-       
-        import { FSWallet } from "./fswallet.js";
 
-          async function loadWallet() {
-               await FSWallet.initFirestore();
-                const wallet = await FSWallet.getUserWallet();
-               document.getElementById("wallet").innerText = wallet;
-}
-
-loadWallet();
-</script>
 <script>
 
 // ================= USER NAME =================
