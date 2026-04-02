@@ -75,8 +75,16 @@ document.getElementById('login-form').onsubmit = async (e) => {
       email: userCredential.user.email,
       loggedIn: true
     }));
+      const ref = doc(db, "users", user.email.toLowerCase());
+      const snap = await getDoc(ref);
 
-    alert("Login successful!");
+       if (!snap.exists()) {
+           await setDoc(ref, {
+               email: user.email,
+            wallet: 0
+        });
+    }
+
 
     window.location.href = "matches.html";
 
