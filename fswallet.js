@@ -30,9 +30,6 @@ export const FSWallet = {
     const snap = await getDoc(ref);
 
     return snap.exists() ? snap.data().wallet || 0 : 0;
-} else {
-      return 0;
-    }
   }
 
 };
