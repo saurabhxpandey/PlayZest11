@@ -24,6 +24,19 @@
 }
 
 loadWallet();
+        async function joinMatch(id) {
+    const hasBalance = await FSWallet.hasUserBalance(10);
+    if (!hasBalance) {
+        alert("Insufficient balance!");
+        return;
+    }
+
+    //await FSWallet.updateUserWallet(-10);
+    FSWallet.updateAllDisplays(await FSWallet.getUserWallet());
+
+    window.location.href = "join-contest.html?match=" + id;
+}
+
 </script>
 
 <!-- 🔐 AUTO LOGIN CHECK -->
@@ -237,20 +250,6 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
         applyFilter();
     });
 });
-
-// ================= JOIN MATCH =================
-async function joinMatch(id) {
-    const hasBalance = await FSWallet.hasUserBalance(10);
-    if (!hasBalance) {
-        alert("Insufficient balance!");
-        return;
-    }
-
-    //await FSWallet.updateUserWallet(-10);
-    FSWallet.updateAllDisplays(await FSWallet.getUserWallet());
-
-    window.location.href = "join-contest.html?match=" + id;
-}
 
 // ================= AUTO REFRESH =================
 fetchMatches();
