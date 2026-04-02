@@ -238,7 +238,7 @@ async function joinMatch(id) {
         return;
     }
 
-    await FSWallet.updateUserWallet(-10);
+    //await FSWallet.updateUserWallet(-10);
     FSWallet.updateAllDisplays(await FSWallet.getUserWallet());
 
     window.location.href = "join-contest.html?match=" + id;
