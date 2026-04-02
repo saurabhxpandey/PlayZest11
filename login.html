@@ -66,31 +66,32 @@ document.getElementById('login-form').onsubmit = async (e) => {
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
 
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+ try {
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-    // ✅ LOCAL STORAGE SAVE (MOST IMPORTANT)
-    localStorage.setItem("user", JSON.stringify({
-      name: userCredential.user.email,
-      email: userCredential.user.email,
-      loggedIn: true
-    }));
-      const ref = doc(db, "users", user.email.toLowerCase());
-      const snap = await getDoc(ref);
+  const user = userCredential.user; // ✅ IMPORTANT LINE
 
-       if (!snap.exists()) {
-           await setDoc(ref, {
-               email: user.email,
-            wallet: 0
-        });
-    }
+  // ✅ LOCAL STORAGE SAVE
+  localStorage.setItem("user", JSON.stringify({
+    name: user.email,
+    email: user.email,
+    loggedIn: true
+  }));
 
+  // ✅ Firestore check/create
+  const ref = doc(db, "users", user.email.toLowerCase());
+  const snap = await getDoc(ref);
 
-    window.location.href = "matches.html";
-
-  } catch (error) {
-    alert(error.message);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      email: user.email,
+      wallet: 0
+    });
   }
+
+} catch (err) {
+  console.log(err);
+}
 };
 </script>
 </body>
