@@ -66,12 +66,15 @@ if (!user || !user.loggedIn) {
     </div>
 </section>
  <script type="module">
-    import { FSWallet } from "fswallet.js";
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+       import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    async function loadWallet() {
-       await FSWallet.initFirestore();
-       const wallet = await FSWallet.getUserWallet();
-       document.getElementById("wallet").innerText = wallet;
+         import { FSWallet } from "./fswallet.js";
+
+          async function loadWallet() {
+               await FSWallet.initFirestore();
+                const wallet = await FSWallet.getUserWallet();
+               document.getElementById("wallet").innerText = wallet;
 }
 
 loadWallet();
