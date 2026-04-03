@@ -49,14 +49,12 @@ import { getAuth, signInWithEmailAndPassword }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
-  authDomain: "playzest11.firebaseapp.com",
-  projectId: "playzest11",
-  storageBucket: "playzest11.firebasestorage.app",
-  messagingSenderId: "465045882002",
-  appId: "1:465045882002:web:7653d2ad9f26e7ecbe124b",
-  measurementId: "G-TSS8JKGEDJ"
+  apiKey: "AIzaSyA6TMMSZUSUX7HhV2G3T4OVaYyrDko4jqk",
+  authDomain: "mydreamteam-94f4c.firebaseapp.com",
+  projectId: "mydreamteam-94f4c",
+  appId: "1:298463861254:web:9512080e4d2eac95bf0187"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -66,32 +64,28 @@ document.getElementById('login-form').onsubmit = async (e) => {
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
 
- try {
-  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-  const user = userCredential.user; // ✅ IMPORTANT LINE
+    // ✅ LOCAL STORAGE SAVE (MOST IMPORTANT)
+    // Load user data from Firestore
+    localStorage.setItem("user", JSON.stringify({
+      name: userCredential.user.displayName || userCredential.user.email,
+      email: userCredential.user.email,
+      loggedIn: true
+    }));
 
-  // ✅ LOCAL STORAGE SAVE
-  localStorage.setItem("user", JSON.stringify({
-    name: user.email,
-    email: user.email,
-    loggedIn: true
-  }));
+    // Init wallet sync
+    await FSWallet.initFirestore();
+    await FSWallet.getUserWallet(userCredential.user.email);
 
-  // ✅ Firestore check/create
-  const ref = doc(db, "users", user.email.toLowerCase());
-  const snap = await getDoc(ref);
+    alert("Login successful!");
+    window.location.href = "matches.html";
 
-  if (!snap.exists()) {
-    await setDoc(ref, {
-      email: user.email,
-      wallet: 0
-    });
+
+  } catch (error) {
+    alert(error.message);
   }
-   window.location.href = "matches.html";
-} catch (err) {
-  console.log(err);
-}
 };
 </script>
 </body>
