@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
     <!-- Razorpay -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -94,8 +92,16 @@ if (!user || !user.loggedIn) {
     </div>
 </section>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// 🔐 USER
+const userId = user.email.toLowerCase();
+    
+    document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("user-name").innerText =
         user?.name || user?.email || "User";
@@ -105,38 +111,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadWallet();
 });
-
-// ================= USER =================
-
-const userId = user.email.toLowerCase();
-
-// ================= FIREBASE =================
+// 🔥 FIREBASE INIT
 const firebaseConfig = {
   apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
   authDomain: "playzest11.firebaseapp.com",
   projectId: "playzest11"
 };
 
-// 🔥 ensure firebase loaded
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-const db = firebase.firestore();
-
-// ================= WALLET =================
+// 💰 WALLET
 let wallet = 0;
 
 async function loadWallet() {
     try {
-        const ref = db.collection("users").doc(userId);
-        const doc = await ref.get();
+        const ref = doc(db, "users", userId);
+        const snapshot = await getDoc(ref);
 
-        if (!doc.exists) {
-            await ref.set({ wallet: 0 }); // 🔥 zero start
+        if (!snapshot.exists()) {
+            await setDoc(ref, { wallet: 0 });
             wallet = 0;
         } else {
-            wallet = doc.data().wallet || 0;
+            wallet = snapshot.data().wallet || 0;
         }
 
         updateUI();
@@ -151,21 +148,24 @@ function updateUI() {
     document.getElementById("current-balance").innerText = wallet;
 }
 
+// 🔥 START
+document.addEventListener("DOMContentLoaded", () => {
+    loadWallet();
+});
+
+// ➕ UPDATE
 async function updateWallet(amount) {
     wallet += amount;
     if (wallet < 0) wallet = 0;
 
-    await db.collection("users").doc(userId).set({
-        wallet: wallet
-    });
+    await setDoc(doc(db, "users", userId), {
+    wallet: wallet
+}, { merge: true });
 
     updateUI();
 }
 
-// ================= INIT =================
 
-
-// ================= LOGOUT =================
 function logout() {
     localStorage.removeItem("user");
     window.location.href = "index.html";
