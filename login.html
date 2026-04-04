@@ -44,10 +44,9 @@
     </section>
 
    <script type="module">
-       import { FSWallet } from "./fswallet.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } 
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6TMMSZUSUX7HhV2G3T4OVaYyrDko4jqk",
@@ -76,10 +75,7 @@ document.getElementById('login-form').onsubmit = async (e) => {
       loggedIn: true
     }));
 
-    // Init wallet sync
-    await FSWallet.initFirestore();
-    await FSWallet.getUserWallet(userCredential.user.email);
-
+    
     alert("Login successful!");
     window.location.href = "matches.html";
 
