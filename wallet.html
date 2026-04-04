@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
     <!-- Razorpay -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -107,13 +107,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ================= USER =================
-const user = JSON.parse(localStorage.getItem("user"));
 
-if (!user) {
-    window.location.href = "index.html";
-}
-
-const userId = user.email;
+const userId = user.email.toLowerCase();
 
 // ================= FIREBASE =================
 const firebaseConfig = {
@@ -168,9 +163,7 @@ async function updateWallet(amount) {
 }
 
 // ================= INIT =================
-document.addEventListener("DOMContentLoaded", function () {
-    loadWallet();
-});
+
 
 // ================= LOGOUT =================
 function logout() {
