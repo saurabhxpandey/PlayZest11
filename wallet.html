@@ -183,21 +183,34 @@ document.querySelectorAll('.amount-btn').forEach(btn => {
 function openRazorpay(amount) {
 
     var options = {
-        key: "rzp_test_SUgayesX5AYTkg", 
+        key: "rzp_test_SUgayesX5AYTkg",
         amount: amount * 100,
         currency: "INR",
         name: "PlayZest11",
         description: `Deposit ₹${amount}`,
 
-         method: {
-           upi: true,
-           card: true,
-            netbanking: true,
-            wallet: true
+        // ✅ Better way to show all options
+        config: {
+            display: {
+                blocks: {
+                    banks: {
+                        name: "Pay using UPI / Cards",
+                        instruments: [
+                            { method: "upi" },
+                            { method: "card" },
+                            { method: "netbanking" },
+                            { method: "wallet" }
+                        ]
+                    }
+                },
+                sequence: ["block.banks"],
+                preferences: {
+                    show_default_blocks: true
+                }
             }
+        },
 
         handler: async function (response) {
-
             await updateWallet(amount);
 
             alert(`✅ ₹${amount} added successfully!\nPayment ID: ${response.razorpay_payment_id}`);
