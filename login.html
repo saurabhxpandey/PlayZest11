@@ -83,9 +83,34 @@ document.getElementById('login-form').onsubmit = async (e) => {
     window.location.href = "matches.html";
 
   } catch (error) {
-  console.log(error.code); 
-  alert(error.message);
+
+  console.log("Error Code:", error.code); 
+  switch (error.code) {
+
+    case "auth/user-not-found":
+      alert("❌ User exist nahi karta. Pehle register karo.");
+      break;
+
+    case "auth/wrong-password":
+      alert("❌ Password galat hai.");
+      break;
+
+    case "auth/invalid-email":
+      alert("❌ Email format galat hai.");
+      break;
+
+    case "auth/invalid-credential":
+      alert("❌ Email ya password galat hai.");
+      break;
+
+    case "auth/too-many-requests":
+      alert("⚠️ Bahut zyada attempts. Thodi der baad try karo.");
+      break;
+
+    default:
+      alert("Error: " + error.message);
   }
+}
 };
 </script>
 </body>
