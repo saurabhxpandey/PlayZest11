@@ -88,9 +88,8 @@
 
       // ✅ 📩 Send verification email
       await sendEmailVerification(userCredential.user);
-
       alert("Verification email sent! Please check your inbox. If unavailable check spam.  📧");
-        
+        window.location.href = "login.html"
 
     } catch (error) {
       alert(error.message);
