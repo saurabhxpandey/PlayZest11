@@ -5,48 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login -PlayZest11</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <h2><i class="fas fa-trophy"></i> PlayZest11</h2>
-            </div>
-            <nav>
-                <a href="index.html">← Home</a>
-            </nav>
-        </div>
-    </header>
 
-    <!-- Login Section -->
-    <section class="auth-section">
-        <div class="container">
-            <div class="auth-card">
-                <h1>Welcome Back</h1>
-                <p>Login to continue your fantasy journey</p>
-                <form id="login-form">
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="login-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="login-password" required>
-                    </div>
-                    <button type="submit" class="auth-btn">Login</button>
-                </form>
-                <p class="auth-link">Don't have an account? <a href="register.html">Register here</a></p>
-            </div>
-        </div>
-    </section>
+<section class="auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <h1>Welcome Back</h1>
 
-   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } 
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Enter Email" required>
+                <input type="password" id="login-password" placeholder="Enter Password" required>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <!-- 🔥 Forgot Password -->
+            <p>
+              Forgot Password? 
+              <a href="#" onclick="resetPassword()">Reset here</a>
+            </p>
+
+            <p>Don't have account? <a href="register.html">Register</a></p>
+        </div>
+    </div>
+</section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA6TMMSZUSUX7HhV2G3T4OVaYyrDko4jqk",
@@ -58,63 +49,94 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+
+// 🔐 LOGIN
 document.getElementById('login-form').onsubmit = async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
 
   try {
-  const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password.trim());
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  const user = userCredential.user;
+    await user.reload();
 
-  // 🔄 IMPORTANT: reload user data
-  await user.reload();
+    if (!user.emailVerified) {
+      alert("Please verify your email 📧");
+      return;
+    }
 
-  if (!user.emailVerified) {
-    alert("Please verify your email. 📧");
-    return;
-  }
+    localStorage.setItem("user", JSON.stringify({
+      name: user.displayName || user.email,
+      email: user.email,
+      loggedIn: true
+    }));
 
-  localStorage.setItem("user", JSON.stringify({
-    name: user.displayName || user.email,
-    email: user.email,
-    loggedIn: true
-  }));
-
+    alert("Login successful ✅");
     window.location.href = "matches.html";
 
   } catch (error) {
 
-  console.log("Error Code:", error.code); 
-  switch (error.code) {
+    switch (error.code) {
+      case "auth/user-not-found":
+        alert("User not found. Please register.");
+        break;
 
-    case "auth/user-not-found":
-      alert("❌ User doesn't exist. please register");
-      break;
+      case "auth/wrong-password":
+        alert("Wrong password.");
+        break;
 
-    case "auth/wrong-password":
-      alert("❌ Wrong password.");
-      break;
+      case "auth/invalid-email":
+        alert("Invalid email.");
+        break;
 
-    case "auth/invalid-email":
-      alert("❌ Wrong Email format.");
-      break;
+      case "auth/invalid-credential":
+        alert("Wrong email or password.");
+        break;
 
-    case "auth/invalid-credential":
-      alert("❌ Wrong email or password.");
-      break;
+      case "auth/too-many-requests":
+        alert("Too many attempts. Try later.");
+        break;
 
-    case "auth/too-many-requests":
-      alert("⚠️ Too many attempts. Try after some time.");
-      break;
-
-    default:
-      alert("Error: " + error.message);
+      default:
+        alert(error.message);
+    }
   }
-}
+};
+
+
+// 🔥 RESET PASSWORD FUNCTION
+window.resetPassword = async function () {
+  const email = document.getElementById("login-email").value.trim();
+
+  if (!email) {
+    alert("Please enter your email first 📧");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent! Check inbox 📩");
+
+  } catch (error) {
+
+    switch (error.code) {
+      case "auth/user-not-found":
+        alert("No account found with this email.");
+        break;
+
+      case "auth/invalid-email":
+        alert("Invalid email format.");
+        break;
+
+      default:
+        alert(error.message);
+    }
+  }
 };
 </script>
+
 </body>
 </html>
