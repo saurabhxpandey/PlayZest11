@@ -83,7 +83,8 @@ document.getElementById('login-form').onsubmit = async (e) => {
     window.location.href = "matches.html";
 
   } catch (error) {
-    alert(error.message);
+  console.log(error.code); 
+  alert(error.message);
   }
 };
 </script>
