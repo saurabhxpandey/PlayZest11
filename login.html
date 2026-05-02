@@ -65,20 +65,23 @@ document.getElementById('login-form').onsubmit = async (e) => {
   const password = document.getElementById('login-password').value;
 
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password.trim());
 
-    // 🔐 Email verify check
-    if (!userCredential.user.emailVerified) {
-      alert("Please verify your email. 📧");
-      return;
-    }
+  const user = userCredential.user;
 
-    // ✅ LOCAL STORAGE SAVE
-    localStorage.setItem("user", JSON.stringify({
-      name: userCredential.user.displayName || userCredential.user.email,
-      email: userCredential.user.email,
-      loggedIn: true
-    }));
+  // 🔄 IMPORTANT: reload user data
+  await user.reload();
+
+  if (!user.emailVerified) {
+    alert("Please verify your email. 📧");
+    return;
+  }
+
+  localStorage.setItem("user", JSON.stringify({
+    name: user.displayName || user.email,
+    email: user.email,
+    loggedIn: true
+  }));
 
     window.location.href = "matches.html";
 
@@ -88,23 +91,23 @@ document.getElementById('login-form').onsubmit = async (e) => {
   switch (error.code) {
 
     case "auth/user-not-found":
-      alert("❌ User exist nahi karta. Pehle register karo.");
+      alert("❌ User doesn't exist. please register");
       break;
 
     case "auth/wrong-password":
-      alert("❌ Password galat hai.");
+      alert("❌ Wrong password.");
       break;
 
     case "auth/invalid-email":
-      alert("❌ Email format galat hai.");
+      alert("❌ Wrong Email format.");
       break;
 
     case "auth/invalid-credential":
-      alert("❌ Email ya password galat hai.");
+      alert("❌ Wrong email or password.");
       break;
 
     case "auth/too-many-requests":
-      alert("⚠️ Bahut zyada attempts. Thodi der baad try karo.");
+      alert("⚠️ Too many attempts. Try after some time.");
       break;
 
     default:
