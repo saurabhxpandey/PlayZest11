@@ -51,8 +51,8 @@
 <script type="module">
   // Import Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, updateProfile } 
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getAuth, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } 
+     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   // 🔥 Apna Firebase config yaha daalo
  const firebaseConfig = {
@@ -78,16 +78,19 @@
     const password = document.getElementById('reg-password').value;
 
     try {
-      // Create user
+      // ✅ Create user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      // Save name
+      // ✅ Save name
       await updateProfile(userCredential.user, {
         displayName: name
       });
 
-      alert("Registration successful!");
-      window.location.href = "login.html";
+      // ✅ 📩 Send verification email
+      await sendEmailVerification(userCredential.user);
+
+      alert("Verification email sent! Please check your inbox 📧");
+        window
 
     } catch (error) {
       alert(error.message);
