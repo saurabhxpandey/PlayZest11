@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Help & Support | PlayZest11</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass-level-1 {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: #0c1609;
+            color: #dae6d0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#39ff14",
+                      "on-surface-variant": "#baccb0",
+                      "background": "#0c1609",
+                      "surface-container-highest": "#2d3828",
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+
+<header class="fixed top-0 w-full z-50 bg-surface-container-highest/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
+    <div class="flex items-center w-full px-5 h-16 max-w-lg mx-auto">
+        <a href="profile.html" class="mr-4 text-on-surface-variant hover:text-white transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold text-white">Help & Support</h1>
+    </div>
+</header>
+
+<main class="pt-24 px-5 max-w-lg mx-auto space-y-6 pb-12">
+    
+    <div class="glass-level-1 rounded-2xl p-6 border border-white/10 text-center">
+        <span class="material-symbols-outlined text-6xl text-primary-container mb-2">support_agent</span>
+        <h2 class="text-xl font-black text-white mb-2">How can we help?</h2>
+        <p class="text-sm text-on-surface-variant mb-6">Our support team is available 24/7 to assist you with any queries regarding matches, wallets, or KYC.</p>
+        
+        <button onclick="contactSupport()" class="w-full bg-[#25D366] text-white font-bold text-lg py-3 rounded-lg hover:bg-[#128C7E] active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(37,211,102,0.3)]">
+            <i class="fab fa-whatsapp text-xl"></i> Chat on WhatsApp
+        </button>
+    </div>
+
+    <div>
+        <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant mb-4">Frequently Asked Questions</h3>
+        <div class="space-y-3">
+            <details class="glass-level-1 p-4 rounded-xl cursor-pointer group">
+                <summary class="font-bold text-white flex justify-between items-center outline-none">
+                    How do I withdraw my winnings?
+                    <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <p class="text-xs text-on-surface-variant mt-3 leading-relaxed">You need to complete your KYC verification first. Once verified, go to the Wallet section, click on Withdraw, enter the amount (Min ₹50) and your bank details.</p>
+            </details>
+
+            <details class="glass-level-1 p-4 rounded-xl cursor-pointer group">
+                <summary class="font-bold text-white flex justify-between items-center outline-none">
+                    My KYC is pending for a long time?
+                    <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <p class="text-xs text-on-surface-variant mt-3 leading-relaxed">KYC verification usually takes 24-48 hours. If it has been longer than that, please contact our support team via WhatsApp with your registered email.</p>
+            </details>
+
+            <details class="glass-level-1 p-4 rounded-xl cursor-pointer group">
+                <summary class="font-bold text-white flex justify-between items-center outline-none">
+                    How are fantasy points calculated?
+                    <span class="material-symbols-outlined text-on-surface-variant group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <p class="text-xs text-on-surface-variant mt-3 leading-relaxed">Points are calculated based on the real-life performance of your selected players. Captains get 2x points and Vice-Captains get 1.5x points.</p>
+            </details>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    function contactSupport() {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const email = user ? user.email : "Unknown User";
+        const phone = '7673019496'; // Using the same phone number as withdrawal
+        const text = `Hi Support Team! 👋\nI need help with my PlayZest11 account.\nMy Email: ${email}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+</script>
+</body>
+</html>

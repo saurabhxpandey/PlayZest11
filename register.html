@@ -1,100 +1,163 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register -PlayZest11</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Register | PlayZest11</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass-level-1 {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+        body {
+            background-color: #0c1609;
+            color: #dae6d0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-input {
+            background: rgba(0,0,0,0.2) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: #dae6d0 !important;
+        }
+        .form-input:focus {
+            border-color: #39ff14 !important;
+            box-shadow: 0 0 5px rgba(57, 255, 20, 0.5) !important;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#2ae500",
+                      "primary-container": "#39ff14",
+                      "on-primary-container": "#107100",
+                      "on-surface-variant": "#baccb0",
+                      "background": "#0c1609",
+                      "on-surface": "#dae6d0",
+                      "surface": "#0c1609",
+              }
+            }
+          }
+        }
+    </script>
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
-                <h2><i class="fas fa-trophy"></i> PlayZest11</h2>
-            </div>
-            <nav>
-                <a href="index.html">← Home</a>
-            </nav>
-        </div>
-    </header>
+<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container">
 
-    <!-- Register Section -->
-    <section class="auth-section">
-        <div class="container">
-            <div class="auth-card">
-                <h1>Join PlayZest11</h1>
-                <p>Create account to start winning</p>
-                <form id="register-form">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="reg-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="reg-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="reg-password" required>
-                    </div>
-                    <button type="submit" class="auth-btn">Register</button>
-                </form>
-                <p class="auth-link">Already have account? <a href="login.html">Login here</a></p>
-            </div>
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20">
+    <div class="flex justify-between items-center w-full px-5 h-16 max-w-7xl mx-auto">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-trophy text-primary-container text-2xl"></i>
+            <span class="text-2xl font-black tracking-tighter text-primary-container">PlayZest11</span>
         </div>
-    </section>
+        <nav>
+            <a href="index.html" class="text-sm font-semibold text-on-surface-variant hover:text-primary-container transition-colors duration-300">← Home</a>
+        </nav>
+    </div>
+</header>
 
-   <!-- Firebase SDK -->
+<main class="flex-grow flex items-center justify-center pt-24 pb-12 px-5">
+    <div class="glass-level-1 w-full max-w-md p-8 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute -top-10 -left-10 w-32 h-32 bg-primary-container/20 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="text-center mb-8 relative z-10">
+            <h1 class="text-3xl font-bold text-white mb-2">Create Account</h1>
+            <p class="text-sm text-on-surface-variant">Join the elite fantasy league</p>
+        </div>
+
+        <form id="register-form" class="space-y-4 relative z-10">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Full Name</label>
+                <input type="text" id="reg-name" class="form-input w-full rounded-lg px-4 py-3 outline-none transition-all" placeholder="Enter your name" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Email Address</label>
+                <input type="email" id="reg-email" class="form-input w-full rounded-lg px-4 py-3 outline-none transition-all" placeholder="Enter your email" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Password</label>
+                <input type="password" id="reg-password" class="form-input w-full rounded-lg px-4 py-3 outline-none transition-all" placeholder="Create a password" required>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Confirm Password</label>
+                <input type="password" id="reg-confirm-password" class="form-input w-full rounded-lg px-4 py-3 outline-none transition-all" placeholder="Confirm your password" required>
+            </div>
+
+            <button type="submit" class="w-full bg-primary-container text-on-primary-container font-bold text-lg py-3 rounded-lg neon-glow active:scale-95 transition-all mt-6">
+                Register
+            </button>
+        </form>
+
+        <p class="text-center text-sm text-on-surface-variant mt-8 relative z-10">
+            Already have an account? <a href="login.html" class="text-primary-container font-semibold hover:underline">Login here</a>
+        </p>
+    </div>
+</main>
+
 <script type="module">
-  // Import Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } 
-     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-  // 🔥 Apna Firebase config yaha daalo
- const firebaseConfig = {
-  apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
-  authDomain: "playzest11.firebaseapp.com",
-  projectId: "playzest11",
-  storageBucket: "playzest11.firebasestorage.app",
-  messagingSenderId: "465045882002",
-  appId: "1:465045882002:web:7653d2ad9f26e7ecbe124b",
-  measurementId: "G-TSS8JKGEDJ"
+const firebaseConfig = {
+    apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
+    authDomain: "playzest11.firebaseapp.com",
+    projectId: "playzest11",
+    storageBucket: "playzest11.firebasestorage.app",
+    messagingSenderId: "465045882002",
+    appId: "1:465045882002:web:7653d2ad9f26e7ecbe124b"
 };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+// 📝 REGISTRATION
+document.getElementById('register-form').onsubmit = async (e) => {
+  e.preventDefault();
 
-  // Form submit
-  document.getElementById('register-form').onsubmit = async (e) => {
-    e.preventDefault();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value.trim();
+  const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
 
-    const name = document.getElementById('reg-name').value;
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
+  if (password !== confirmPassword) {
+    alert("Passwords do not match! ❌");
+    return;
+  }
 
-    try {
-      // ✅ Create user
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-      // ✅ Save name
-      await updateProfile(userCredential.user, {
-        displayName: name
-      });
+    await updateProfile(user, { displayName: name });
+    alert("Registration successful! ✅ You can now log in.");
+    window.location.href = "login.html";
 
-      // ✅ 📩 Send verification email
-      await sendEmailVerification(userCredential.user);
-      alert("Verification email sent! Please check your inbox. If unavailable check spam.  📧");
-        window.location.href = "login.html"
-
-    } catch (error) {
-      alert(error.message);
+  } catch (error) {
+    switch (error.code) {
+      case "auth/email-already-in-use": alert("Email already exists. Please login."); break;
+      case "auth/weak-password": alert("Password must be at least 6 characters."); break;
+      case "auth/invalid-email": alert("Invalid email format."); break;
+      default: alert(error.message);
     }
-  };
+  }
+};
 </script>
+
 </body>
 </html>

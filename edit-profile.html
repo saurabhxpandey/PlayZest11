@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Edit Profile | PlayZest11</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .glass-level-1 {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: #0c1609;
+            color: #dae6d0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .form-input {
+            background: rgba(0,0,0,0.3) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: #fff !important;
+        }
+        .form-input:focus {
+            border-color: #39ff14 !important;
+            box-shadow: 0 0 5px rgba(57, 255, 20, 0.5) !important;
+            outline: none;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#39ff14",
+                      "on-surface-variant": "#baccb0",
+                      "background": "#0c1609",
+                      "surface-container-highest": "#2d3828",
+                      "error": "#ffb4ab",
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+
+<header class="fixed top-0 w-full z-50 bg-surface-container-highest/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
+    <div class="flex items-center w-full px-5 h-16 max-w-lg mx-auto">
+        <a href="profile.html" class="mr-4 text-on-surface-variant hover:text-white transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold text-white">Personal Info</h1>
+    </div>
+</header>
+
+<main class="pt-24 px-5 max-w-lg mx-auto space-y-4 pb-12">
+    
+    <div class="text-center mb-8 relative">
+        <div class="w-24 h-24 rounded-full bg-surface-container-highest mx-auto flex items-center justify-center border-2 border-primary-container shadow-[0_0_15px_rgba(57,255,20,0.3)] overflow-hidden relative group">
+            <img id="avatar" src="https://ui-avatars.com/api/?name=User" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/60 hidden group-hover:flex items-center justify-center cursor-pointer transition-all">
+                <span class="material-symbols-outlined text-white">photo_camera</span>
+            </div>
+        </div>
+        <p class="text-[10px] text-on-surface-variant uppercase mt-2 font-bold tracking-widest">Tap to change avatar</p>
+    </div>
+
+    <form id="profile-form" class="glass-level-1 p-5 rounded-2xl space-y-5">
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Email (Uneditable)</label>
+            <input type="email" id="email" class="form-input w-full rounded-lg px-4 py-3 opacity-50 cursor-not-allowed" disabled>
+        </div>
+        
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Display Name</label>
+            <input type="text" id="name" class="form-input w-full rounded-lg px-4 py-3" required placeholder="Enter full name">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Phone Number</label>
+            <input type="tel" id="phone" class="form-input w-full rounded-lg px-4 py-3" placeholder="+91 ">
+        </div>
+
+        <button type="submit" id="save-btn" class="w-full bg-primary-container text-[#107100] font-black text-lg py-3 rounded-lg hover:bg-[#2ae500] active:scale-95 transition-all shadow-[0_0_15px_rgba(57,255,20,0.4)] mt-4">
+            Save Changes
+        </button>
+    </form>
+
+</main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
+        authDomain: "playzest11.firebaseapp.com",
+        projectId: "playzest11",
+        storageBucket: "playzest11.firebasestorage.app",
+        messagingSenderId: "465045882002",
+        appId: "1:465045882002:web:7653d2ad9f26e7ecbe124b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const userStr = localStorage.getItem("user");
+    if (!userStr) window.location.href = "login.html";
+    let user = JSON.parse(userStr);
+
+    // Pre-fill
+    document.getElementById('email').value = user.email || '';
+    document.getElementById('name').value = user.name || '';
+    document.getElementById('phone').value = user.phone || '';
+    document.getElementById('avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=107100&color=39ff14`;
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('save-btn');
+        btn.innerText = "Saving...";
+        btn.disabled = true;
+
+        const newName = document.getElementById('name').value;
+        const newPhone = document.getElementById('phone').value;
+
+        try {
+            // Update Firestore
+            const userId = user.email.toLowerCase();
+            await setDoc(doc(db, "users", userId), {
+                name: newName,
+                phone: newPhone
+            }, { merge: true });
+
+            // Update LocalStorage
+            user.name = newName;
+            user.phone = newPhone;
+            localStorage.setItem("user", JSON.stringify(user));
+
+            alert("✅ Profile updated successfully!");
+            window.location.href = "profile.html";
+        } catch(err) {
+            console.error(err);
+            alert("❌ Failed to update profile.");
+            btn.innerText = "Save Changes";
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

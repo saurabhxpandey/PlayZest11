@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Match History | PlayZest11</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .glass-level-1 {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: #0c1609;
+            color: #dae6d0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#39ff14",
+                      "on-surface-variant": "#baccb0",
+                      "background": "#0c1609",
+                      "surface-container-highest": "#2d3828",
+                      "error": "#ffb4ab",
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+
+<header class="fixed top-0 w-full z-50 bg-surface-container-highest/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
+    <div class="flex items-center w-full px-5 h-16 max-w-lg mx-auto">
+        <a href="profile.html" class="mr-4 text-on-surface-variant hover:text-white transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold text-white">Match History</h1>
+    </div>
+</header>
+
+<main class="pt-24 px-5 max-w-lg mx-auto space-y-4 pb-12">
+    
+    <!-- Filter Tabs -->
+    <div class="flex bg-white/5 p-1 rounded-lg border border-white/10 mb-6">
+        <button class="flex-1 py-2 text-sm font-bold bg-white/10 rounded-md text-white shadow">Completed</button>
+        <button class="flex-1 py-2 text-sm font-bold text-on-surface-variant hover:text-white transition-colors" onclick="alert('No live matches currently.')">Live</button>
+    </div>
+
+    <div id="history-list" class="space-y-4">
+        <!-- History will be injected here -->
+    </div>
+
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const historyList = document.getElementById("history-list");
+        const history = JSON.parse(localStorage.getItem("matchHistory")) || [];
+
+        if (history.length === 0) {
+            historyList.innerHTML = `
+                <div class="text-center py-10 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">history</span>
+                    <p class="font-semibold">No matches joined yet.</p>
+                    <p class="text-xs mt-1">Create a team and join a contest to see your history here.</p>
+                    <a href="matches.html" class="inline-block mt-4 bg-primary-container text-on-primary-container font-bold px-4 py-2 rounded-lg">View Live Matches</a>
+                </div>
+            `;
+            return;
+        }
+
+        history.reverse().forEach(match => {
+            const teamArray = match.teams.split('vs');
+            const team1 = teamArray[0] ? teamArray[0].trim() : "TBA";
+            const team2 = teamArray[1] ? teamArray[1].trim() : "TBA";
+
+            historyList.innerHTML += `
+                <div class="glass-level-1 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all">
+                    <div class="flex justify-between items-center border-b border-white/5 pb-3 mb-3">
+                        <span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">${match.format} Match • ${match.date}</span>
+                        <span class="bg-blue-500/20 text-blue-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${match.status}</span>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-black text-sm text-white border border-white/10">${team1.substring(0,3)}</div>
+                            <span class="font-black text-sm text-white">${team1}</span>
+                        </div>
+                        <div class="text-center px-2">
+                            <div class="text-[10px] font-bold text-on-surface-variant bg-white/5 px-2 py-1 rounded-full border border-white/10">VS</div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-sm text-white">${team2}</span>
+                            <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-black text-sm text-white border border-white/10">${team2.substring(0,3)}</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-black/30 rounded-lg p-3 border border-white/5">
+                        <div>
+                            <p class="text-[10px] text-on-surface-variant uppercase font-bold">Your Rank</p>
+                            <p class="text-sm font-black text-white">N/A</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-on-surface-variant uppercase font-bold">Points</p>
+                            <p class="text-sm font-black text-white">${match.points || 0}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>KYC & Bank Verification | PlayZest11</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .glass-level-1 {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: #0c1609;
+            color: #dae6d0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .form-input {
+            background: rgba(0,0,0,0.3) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: #fff !important;
+        }
+        .form-input:focus {
+            border-color: #39ff14 !important;
+            box-shadow: 0 0 5px rgba(57, 255, 20, 0.5) !important;
+            outline: none;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#39ff14",
+                      "on-surface-variant": "#baccb0",
+                      "background": "#0c1609",
+                      "surface-container-highest": "#2d3828",
+                      "error": "#ffb4ab",
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+
+<header class="fixed top-0 w-full z-50 bg-surface-container-highest/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
+    <div class="flex items-center w-full px-5 h-16 max-w-lg mx-auto">
+        <a href="profile.html" class="mr-4 text-on-surface-variant hover:text-white transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold text-white">KYC Verification</h1>
+    </div>
+</header>
+
+<main class="pt-24 px-5 max-w-lg mx-auto space-y-6 pb-12">
+    
+    <div id="status-card" class="glass-level-1 rounded-2xl p-6 border border-white/10 text-center relative overflow-hidden hidden">
+        <span id="status-icon" class="material-symbols-outlined text-6xl mb-2">pending_actions</span>
+        <h2 id="status-text" class="text-xl font-black text-white">Verification Pending</h2>
+        <p class="text-sm text-on-surface-variant mt-2">Your documents are currently being reviewed by our team. This usually takes 24-48 hours.</p>
+    </div>
+
+    <form id="kyc-form" class="glass-level-1 p-5 rounded-2xl space-y-6 hidden">
+        <div class="bg-primary-container/10 border border-primary-container/20 rounded-lg p-3 text-xs text-primary-container flex gap-2">
+            <span class="material-symbols-outlined text-[16px]">info</span>
+            <p>Verification is mandatory for withdrawals. Name on PAN and Bank Account must match.</p>
+        </div>
+
+        <div>
+            <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant border-b border-white/10 pb-2 mb-4">PAN Details</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Name on PAN Card</label>
+                    <input type="text" id="pan-name" class="form-input w-full rounded-lg px-4 py-3 uppercase" required placeholder="JOHN DOE">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">PAN Number</label>
+                    <input type="text" id="pan-number" class="form-input w-full rounded-lg px-4 py-3 uppercase" required pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" placeholder="ABCDE1234F">
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant border-b border-white/10 pb-2 mb-4">Bank Details</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Account Number</label>
+                    <input type="password" id="acc-number" class="form-input w-full rounded-lg px-4 py-3" required placeholder="••••••••••••">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Confirm Account Number</label>
+                    <input type="text" id="acc-number-confirm" class="form-input w-full rounded-lg px-4 py-3" required placeholder="1234567890">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">IFSC Code</label>
+                    <input type="text" id="ifsc" class="form-input w-full rounded-lg px-4 py-3 uppercase" required placeholder="SBIN0001234">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="w-full bg-white text-black font-black text-lg py-3 rounded-lg hover:bg-gray-200 active:scale-95 transition-all mt-4">
+            Submit for Verification
+        </button>
+    </form>
+
+</main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
+        authDomain: "playzest11.firebaseapp.com",
+        projectId: "playzest11",
+        storageBucket: "playzest11.firebasestorage.app",
+        messagingSenderId: "465045882002",
+        appId: "1:465045882002:web:7653d2ad9f26e7ecbe124b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const userStr = localStorage.getItem("user");
+    if (!userStr) window.location.href = "login.html";
+    const user = JSON.parse(userStr);
+    const userId = user.email.toLowerCase();
+
+    // Check status
+    async function checkKYCStatus() {
+        const ref = doc(db, "users", userId);
+        const snap = await getDoc(ref);
+        
+        if (snap.exists() && snap.data().kycStatus) {
+            const status = snap.data().kycStatus;
+            document.getElementById('status-card').classList.remove('hidden');
+            
+            const icon = document.getElementById('status-icon');
+            const text = document.getElementById('status-text');
+            
+            if(status === 'pending') {
+                icon.innerText = 'pending_actions';
+                icon.className = 'material-symbols-outlined text-6xl mb-2 text-yellow-500';
+                text.innerText = 'Verification Pending';
+            } else if (status === 'verified') {
+                icon.innerText = 'verified';
+                icon.className = 'material-symbols-outlined text-6xl mb-2 text-primary-container';
+                text.innerText = 'KYC Verified';
+                document.querySelector('#status-card p').innerText = 'Your account is fully verified for withdrawals.';
+            } else if (status === 'rejected') {
+                icon.innerText = 'error';
+                icon.className = 'material-symbols-outlined text-6xl mb-2 text-error';
+                text.innerText = 'Verification Failed';
+                document.querySelector('#status-card p').innerText = 'Your documents were rejected. Please contact support.';
+                document.getElementById('kyc-form').classList.remove('hidden'); // allow resubmit
+            }
+        } else {
+            document.getElementById('kyc-form').classList.remove('hidden');
+        }
+    }
+
+    checkKYCStatus();
+
+    document.getElementById('kyc-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const acc1 = document.getElementById('acc-number').value;
+        const acc2 = document.getElementById('acc-number-confirm').value;
+
+        if (acc1 !== acc2) {
+            alert("Account numbers do not match!");
+            return;
+        }
+
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "Submitting...";
+        btn.disabled = true;
+
+        try {
+            await setDoc(doc(db, "users", userId), {
+                kycStatus: "pending",
+                kycData: {
+                    panName: document.getElementById('pan-name').value.toUpperCase(),
+                    panNumber: document.getElementById('pan-number').value.toUpperCase(),
+                    accountNumber: acc1,
+                    ifsc: document.getElementById('ifsc').value.toUpperCase(),
+                    submittedAt: new Date().toISOString()
+                }
+            }, { merge: true });
+
+            alert("✅ Documents submitted successfully!");
+            window.location.reload();
+        } catch(err) {
+            console.error(err);
+            alert("❌ Failed to submit KYC.");
+            btn.innerText = "Submit for Verification";
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

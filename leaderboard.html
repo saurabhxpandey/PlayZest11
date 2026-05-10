@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Leaderboard | PlayZest11</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        .glass-level-1 {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background-color: #0c1609;
+            color: #dae6d0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .rank-1 { color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .rank-2 { color: #C0C0C0; text-shadow: 0 0 10px rgba(192,192,192,0.5); }
+        .rank-3 { color: #CD7F32; text-shadow: 0 0 10px rgba(205,127,50,0.5); }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#39ff14",
+                      "on-surface-variant": "#baccb0",
+                      "background": "#0c1609",
+                      "surface-container-highest": "#2d3828",
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+
+<header class="fixed top-0 w-full z-50 bg-surface-container-highest/90 backdrop-blur-xl border-b border-white/10 shadow-lg">
+    <div class="flex items-center w-full px-5 h-16 max-w-lg mx-auto">
+        <a href="profile.html" class="mr-4 text-on-surface-variant hover:text-white transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-xl font-bold text-white">Global Leaderboard</h1>
+    </div>
+</header>
+
+<main class="pt-24 px-5 max-w-lg mx-auto space-y-4 pb-12">
+    <!-- Header visual -->
+    <div class="text-center mb-8">
+        <span class="material-symbols-outlined text-6xl text-primary-container drop-shadow-[0_0_15px_rgba(57,255,20,0.5)]">trophy</span>
+        <h2 class="text-2xl font-black text-white mt-2">Top Earners</h2>
+        <p class="text-xs text-on-surface-variant uppercase tracking-widest mt-1">Ranked by Wallet Balance</p>
+    </div>
+
+    <div id="loading" class="text-center py-10">
+        <div class="w-8 h-8 border-4 border-primary-container border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-sm font-semibold text-on-surface-variant">Fetching live rankings...</p>
+    </div>
+
+    <!-- Leaderboard List -->
+    <div id="leaderboard-list" class="space-y-3 hidden">
+        <!-- JS injects here -->
+    </div>
+</main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDTJE-s-UPrvL3824m8kakqUCZHYbAPpug",
+        authDomain: "playzest11.firebaseapp.com",
+        projectId: "playzest11",
+        storageBucket: "playzest11.firebasestorage.app",
+        messagingSenderId: "465045882002",
+        appId: "1:465045882002:web:7653d2ad9f26e7ecbe124b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchLeaderboard() {
+        try {
+            const q = query(collection(db, "users"), orderBy("wallet", "desc"), limit(20));
+            const querySnapshot = await getDocs(q);
+            
+            const listDiv = document.getElementById("leaderboard-list");
+            document.getElementById("loading").classList.add("hidden");
+            listDiv.classList.remove("hidden");
+
+            if(querySnapshot.empty) {
+                listDiv.innerHTML = `<div class="text-center py-10 text-on-surface-variant">No players found.</div>`;
+                return;
+            }
+
+            let html = "";
+            let rank = 1;
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const name = data.name || doc.id.split('@')[0];
+                const balance = data.wallet || 0;
+                
+                let rankClass = "text-on-surface-variant";
+                let rankIcon = `#${rank}`;
+                if(rank === 1) { rankClass = "rank-1 text-2xl"; rankIcon = "🥇"; }
+                if(rank === 2) { rankClass = "rank-2 text-xl"; rankIcon = "🥈"; }
+                if(rank === 3) { rankClass = "rank-3 text-lg"; rankIcon = "🥉"; }
+
+                html += `
+                <div class="glass-level-1 rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 font-black ${rankClass} text-center">${rankIcon}</div>
+                        <div class="flex items-center gap-3">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2d3828&color=39ff14" class="w-10 h-10 rounded-full border border-white/10">
+                            <div>
+                                <h3 class="font-bold text-white">${name}</h3>
+                                ${rank <= 3 ? '<p class="text-[10px] text-primary-container font-bold uppercase">Pro Player</p>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-on-surface-variant font-bold uppercase tracking-widest">Winnings</p>
+                        <p class="font-black text-white text-lg">₹${balance}</p>
+                    </div>
+                </div>`;
+                rank++;
+            });
+
+            listDiv.innerHTML = html;
+        } catch(err) {
+            console.error(err);
+            document.getElementById("loading").innerHTML = `<p class="text-error font-bold">Failed to load leaderboard. Please try again.</p>`;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchLeaderboard);
+</script>
+</body>
+</html>

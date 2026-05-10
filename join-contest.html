@@ -1,68 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Team</title>
-
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Create Team | PlayZest11</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass-level-1 {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+        }
+        body {
+            background-color: #0c1609;
+            color: #dae6d0;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        
+        .player-card.selected {
+            background: rgba(57, 255, 20, 0.1);
+            border-color: #39ff14;
+        }
+        .player-card.selected .select-icon {
+            color: #39ff14;
+            content: "check_circle";
+        }
+    </style>
+    <script>
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#2ae500",
+                      "primary-container": "#39ff14",
+                      "on-primary-container": "#107100",
+                      "on-surface-variant": "#baccb0",
+                      "background": "#0c1609",
+                      "surface-container-highest": "#2d3828",
+                      "on-surface": "#dae6d0",
+                      "surface": "#0c1609",
+                      "error": "#ffb4ab",
+              }
+            }
+          }
+        }
+    </script>
 </head>
+<body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container pb-32">
 
-<body>
-
-<header class="header">
-    <div class="container">
-        <div class="logo">
-            <h2>🏏 Create Team</h2>
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20">
+    <div class="flex items-center w-full px-5 h-16 max-w-7xl mx-auto">
+        <a href="matches.html" class="mr-4 text-on-surface-variant hover:text-white transition-colors">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div class="flex flex-col">
+            <h1 class="text-lg font-bold leading-tight truncate max-w-[200px] sm:max-w-[400px]">Create Team</h1>
+            <span class="text-xs text-primary-container font-semibold uppercase tracking-widest">Select 11 Players</span>
         </div>
     </div>
 </header>
 
-<section class="contest-section">
-    <div class="container">
-
-        <!-- MATCH INFO -->
-        <div class="match-info">
-            <h1>Select Your Team</h1>
-            <div class="contest-details">
-                Players: <span id="count">0</span>/11 | Credits: <span id="credits">100</span>
-            </div>
+<!-- Stats Sticky Bar -->
+<div class="fixed top-16 w-full z-40 bg-surface-container-highest/90 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-5 py-3 flex justify-between items-center">
+        <div class="flex flex-col">
+            <span class="text-xs text-on-surface-variant font-semibold uppercase tracking-widest mb-1">Players</span>
+            <div class="text-xl font-black"><span id="count" class="text-primary-container">0</span><span class="text-on-surface-variant text-sm">/11</span></div>
         </div>
-
-        <!-- TEAM BUILDER -->
-        <div class="team-builder">
-
-            <!-- PLAYERS -->
-            <div id="players-list" class="players-grid"></div>
-
-            <!-- SELECTED PLAYERS -->
-            <div class="team-summary">
-                <h3>Selected Players:</h3>
-                <div id="selected-list" class="selected-players"></div>
-
-                <div class="team-actions">
-                    <button onclick="saveTeam()" class="submit-team">
-                        Submit Team
-                    </button>
-                </div>
-            </div>
-
+        <div class="h-8 w-[1px] bg-white/10"></div>
+        <div class="flex flex-col items-end">
+            <span class="text-xs text-on-surface-variant font-semibold uppercase tracking-widest mb-1">Credits Left</span>
+            <div class="text-xl font-black text-white" id="credits">100</div>
         </div>
-
     </div>
-</section>
+</div>
+
+<main class="pt-[130px] px-5 max-w-3xl mx-auto">
+    <!-- Loader -->
+    <div id="loader" class="flex justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-container"></div>
+    </div>
+
+    <!-- Players Grid -->
+    <div id="players-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Players will be injected here -->
+    </div>
+</main>
+
+<!-- Bottom Summary Bar -->
+<div class="fixed bottom-0 w-full z-50 bg-surface-container-highest/90 backdrop-blur-xl border-t border-white/10">
+    <div class="max-w-7xl mx-auto px-5 py-4">
+        <div class="flex justify-between items-center mb-3">
+            <h3 class="text-xs font-semibold text-on-surface-variant uppercase tracking-widest">Selected Players (<span id="summary-count">0</span>)</h3>
+        </div>
+        <div id="selected-list" class="flex flex-wrap gap-2 mb-4 max-h-[60px] overflow-y-auto no-scrollbar">
+            <span class="text-xs text-on-surface-variant italic">No players selected yet</span>
+        </div>
+        <button onclick="saveTeam()" class="w-full bg-primary-container text-on-primary-container font-bold text-lg py-3 rounded-lg neon-glow active:scale-95 transition-all">
+            Submit Team
+        </button>
+    </div>
+</div>
 
 <script>
-
 // LOGIN CHECK
 const user = JSON.parse(localStorage.getItem("user"));
 if (!user || !user.loggedIn) {
-    window.location.href = "index.html";
+    window.location.href = "login.html";
 }
 
 // MATCH ID
 const params = new URLSearchParams(window.location.search);
-const matchId = params.get("match");
+let matchId = params.get("match") || localStorage.getItem("selectedMatchId");
 
 // STATE
 let players = [];
@@ -72,32 +141,34 @@ let credits = 100;
 // ROLE HELPER
 function getRole(role) {
     if (!role) return "BAT";
-
     role = role.toLowerCase();
-
     if (role.includes("wk") || role.includes("keeper")) return "WK";
     if (role.includes("bowl")) return "BOWL";
-    if (role.includes("all")) return "AR";
-
+    if (role.includes("all") || role.includes("ar")) return "AR";
     return "BAT";
 }
 
-// ✅ MAIN FUNCTION (ONLY ONE API USED)
+function getRoleIcon(role) {
+    switch(role) {
+        case 'WK': return 'sports_baseball'; // gloves placeholder
+        case 'BAT': return 'sports_cricket';
+        case 'AR': return 'swap_horiz';
+        case 'BOWL': return 'sports_baseball';
+        default: return 'person';
+    }
+}
+
+// FETCH PLAYERS
 async function fetchPlayers() {
     try {
-
-        const res = await fetch(
-            `https://api.cricapi.com/v1/match_squad?apikey=efa33d67-4814-4f14-a6fc-fd249b9de00b&id=${matchId}`
-        );
-
+        if (!matchId) throw new Error("No match ID provided");
+        
+        const res = await fetch(`https://api.cricapi.com/v1/match_squad?apikey=efa33d67-4814-4f14-a6fc-fd249b9de00b&id=${matchId}`);
         const data = await res.json();
-
-        console.log("CricAPI:", data);
-
+        
         let squadPlayers = [];
 
         if (data && data.data && data.data.length > 0) {
-
             data.data.forEach(team => {
                 team.players.forEach(p => {
                     squadPlayers.push({
@@ -107,86 +178,36 @@ async function fetchPlayers() {
                     });
                 });
             });
-
         }
 
         if (squadPlayers.length === 0) {
-            throw new Error("No players found");
+            throw new Error("No players found in API");
         }
 
         players = squadPlayers;
 
     } catch (err) {
-        console.log("API Error:", err);
-
-        // fallback
+        console.warn("API Error, using fallback data:", err);
+        // Fallback Data
         players = [
             { name: "Virat Kohli", role: "BAT", credit: 10 },
             { name: "Rohit Sharma", role: "BAT", credit: 9 },
-            { name: "Hardik Pandya", role: "AR", credit: 9 },
+            { name: "Hardik Pandya", role: "AR", credit: 9.5 },
             { name: "Jasprit Bumrah", role: "BOWL", credit: 9 },
-            { name: "MS Dhoni", role: "WK", credit: 9 },
+            { name: "MS Dhoni", role: "WK", credit: 8.5 },
             { name: "KL Rahul", role: "BAT", credit: 9 },
             { name: "Shubman Gill", role: "BAT", credit: 9 },
-            { name: "Ravindra Jadeja", role: "AR", credit: 9 },
-            { name: "Mohammed Shami", role: "BOWL", credit: 9 },
-            { name: "Surya Kumar Yadav", role: "BAT", credit: 9 },
-            { name: "Rishabh Pant", role: "WK", credit: 9 }
+            { name: "Ravindra Jadeja", role: "AR", credit: 9.5 },
+            { name: "Mohammed Shami", role: "BOWL", credit: 8.5 },
+            { name: "Surya Kumar Yadav", role: "BAT", credit: 9.5 },
+            { name: "Rishabh Pant", role: "WK", credit: 9 },
+            { name: "Mitchell Starc", role: "BOWL", credit: 9 },
+            { name: "Pat Cummins", role: "AR", credit: 9 },
+            { name: "David Warner", role: "BAT", credit: 9.5 }
         ];
     }
-
-    renderPlayers();
-}
-        
-
-        const data = await res.json();
-
-        let squadPlayers = [];
-
-        // TEAM 1
-        data?.matchInfo?.team1?.playerDetails?.forEach(p => {
-            squadPlayers.push({
-                name: p.name,
-                role: getRole(p.role),
-                credit: Math.floor(8 + Math.random() * 3)
-            });
-        });
-
-        // TEAM 2
-        data?.matchInfo?.team2?.playerDetails?.forEach(p => {
-            squadPlayers.push({
-                name: p.name,
-                role: getRole(p.role),
-                credit: Math.floor(8 + Math.random() * 3)
-            });
-        });
-
-        // अगर players मिले
-        if (squadPlayers.length > 0) {
-            players = squadPlayers;
-        } else {
-            throw new Error("No squad data");
-        }
-
-    } catch (err) {
-        console.log("API Error:", err);
-
-        // ✅ fallback
-        players = [
-            { name: "Virat Kohli", role: "BAT", credit: 10 },
-            { name: "Rohit Sharma", role: "BAT", credit: 9 },
-            { name: "Hardik Pandya", role: "AR", credit: 9 },
-            { name: "Jasprit Bumrah", role: "BOWL", credit: 9 },
-            { name: "MS Dhoni", role: "WK", credit: 9 },
-            { name: "KL Rahul", role: "BAT", credit: 9 },
-            { name: "Shubman Gill", role: "BAT", credit: 9 },
-            { name: "Ravindra Jadeja", role: "AR", credit: 9 },
-            { name: "Mohammed Shami", role: "BOWL", credit: 9 },
-            { name: "Surya Kumar Yadav", role: "BAT", credit: 9 },
-            { name: "Rishabh Pant", role: "WK", credit: 9 }
-        ];
-    }
-
+    
+    document.getElementById('loader').style.display = 'none';
     renderPlayers();
 }
 
@@ -196,37 +217,53 @@ function renderPlayers() {
     container.innerHTML = "";
 
     players.forEach((p, i) => {
+        const isSelected = selected.includes(i);
         container.innerHTML += `
-        <div class="player-card" onclick="togglePlayer(${i})">
-            <div class="player-img">🏏</div>
-            <h4>${p.name}</h4>
-            <p>${p.role}</p>
-            <p>${p.credit} Cr</p>
+        <div id="player-${i}" class="player-card glass-level-1 p-4 rounded-xl border border-white/10 cursor-pointer transition-all hover:bg-white/5 flex justify-between items-center ${isSelected ? 'selected' : ''}" onclick="togglePlayer(${i})">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-surface-container-highest border border-white/5 flex items-center justify-center relative overflow-hidden">
+                    <span class="material-symbols-outlined text-on-surface-variant opacity-50">${getRoleIcon(p.role)}</span>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-white">${p.name}</h4>
+                    <span class="text-xs font-semibold text-on-surface-variant bg-white/5 px-2 py-0.5 rounded uppercase">${p.role}</span>
+                </div>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="text-sm font-black text-white">${p.credit} <span class="text-xs text-on-surface-variant">Cr</span></span>
+                <span class="material-symbols-outlined select-icon mt-1 ${isSelected ? 'text-primary-container' : 'text-white/20'}">${isSelected ? 'check_circle' : 'add_circle'}</span>
+            </div>
         </div>
         `;
     });
 }
 
 // SELECT PLAYER
-function togglePlayer(i) {
+window.togglePlayer = function(i) {
     const player = players[i];
+    const playerCard = document.getElementById(`player-${i}`);
 
     if (selected.includes(i)) {
         selected = selected.filter(id => id !== i);
         credits += player.credit;
+        playerCard.classList.remove('selected');
+        playerCard.querySelector('.select-icon').innerText = 'add_circle';
+        playerCard.querySelector('.select-icon').classList.replace('text-primary-container', 'text-white/20');
     } else {
         if (selected.length >= 11) {
-            alert("Max 11 players!");
+            alert("You can only select 11 players! 🏏");
             return;
         }
-
         if (credits < player.credit) {
-            alert("Not enough credits!");
+            alert("Not enough credits! 💰");
             return;
         }
 
         selected.push(i);
         credits -= player.credit;
+        playerCard.classList.add('selected');
+        playerCard.querySelector('.select-icon').innerText = 'check_circle';
+        playerCard.querySelector('.select-icon').classList.replace('text-white/20', 'text-primary-container');
     }
 
     updateUI();
@@ -235,36 +272,62 @@ function togglePlayer(i) {
 // UPDATE UI
 function updateUI() {
     document.getElementById("count").innerText = selected.length;
-    document.getElementById("credits").innerText = credits;
-
-    document.querySelectorAll(".player-card").forEach((el, i) => {
-        el.classList.toggle("selected", selected.includes(i));
-    });
+    document.getElementById("summary-count").innerText = selected.length;
+    
+    const creditsEl = document.getElementById("credits");
+    creditsEl.innerText = credits;
+    if(credits < 0) creditsEl.classList.add('text-error');
+    else creditsEl.classList.remove('text-error');
 
     const list = document.getElementById("selected-list");
-    list.innerHTML = selected.map(i => `<span>${players[i].name}</span>`).join("");
+    if (selected.length === 0) {
+        list.innerHTML = `<span class="text-xs text-on-surface-variant italic">No players selected yet</span>`;
+    } else {
+        list.innerHTML = selected.map(i => `
+            <div class="text-[10px] font-bold bg-white/10 text-white px-2 py-1 rounded-md border border-white/5 flex items-center gap-1">
+                ${players[i].name} <span class="text-primary-container">${players[i].role}</span>
+            </div>
+        `).join("");
+    }
 }
 
 // SAVE TEAM
-function saveTeam() {
+window.saveTeam = function() {
     if (selected.length !== 11) {
-        alert("Select 11 players!");
+        alert("Please select exactly 11 players! 🏏");
         return;
     }
 
     const team = selected.map(i => players[i]);
-
     localStorage.setItem("team", JSON.stringify(team));
-    localStorage.setItem("matchId", matchId);
+    
+    if (matchId) {
+        localStorage.setItem("matchId", matchId);
+        
+        // Save to History
+        const teams = localStorage.getItem("selectedMatchTeams") || "Unknown Match";
+        const format = localStorage.getItem("selectedMatchFormat") || "T20";
+        let history = JSON.parse(localStorage.getItem("matchHistory")) || [];
+        
+        // Prevent duplicate entries for the same match
+        if(!history.find(h => h.matchId === matchId)) {
+            history.push({
+                matchId: matchId,
+                teams: teams,
+                format: format,
+                date: new Date().toLocaleDateString(),
+                status: "Joined",
+                points: 0
+            });
+            localStorage.setItem("matchHistory", JSON.stringify(history));
+        }
+    }
 
-    alert("Team Saved!");
     window.location.href = "contest.html";
 }
 
 // INIT
 fetchPlayers();
-
 </script>
-
 </body>
 </html>
